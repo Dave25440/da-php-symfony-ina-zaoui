@@ -14,7 +14,13 @@ return RectorConfig::configure()
         __DIR__ . '/tests',
     ])
     ->withPhpSets(php82: true)
-    ->withPreparedSets(doctrineCodeQuality: true, symfonyCodeQuality: true)
+    ->withPreparedSets(
+        typeDeclarations: true,
+        typeDeclarationDocblocks: true,
+        doctrineCodeQuality: true,
+        symfonyCodeQuality: true,
+        symfonyConfigs: true
+    )
     ->withComposerBased(doctrine: true, symfony: true)
     ->withSymfonyContainerXml(__DIR__ . '/var/cache/dev/App_KernelDevDebugContainer.xml')
     ->withSymfonyContainerPhp(__DIR__ . '/tests/symfony-container.php')
