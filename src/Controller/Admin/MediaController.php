@@ -5,7 +5,9 @@ namespace App\Controller\Admin;
 use App\Entity\Media;
 use App\Form\MediaType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class MediaController extends AbstractController
@@ -13,7 +15,7 @@ class MediaController extends AbstractController
     /**
      * @Route("/admin/media", name="admin_media_index")
      */
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $page = $request->query->getInt('page', 1);
 
@@ -65,7 +67,7 @@ class MediaController extends AbstractController
     /**
      * @Route("/admin/media/delete/{id}", name="admin_media_delete")
      */
-    public function delete(int $id)
+    public function delete(int $id): RedirectResponse
     {
         $media = $this->getDoctrine()->getRepository(Media::class)->find($id);
         $this->getDoctrine()->getManager()->remove($media);

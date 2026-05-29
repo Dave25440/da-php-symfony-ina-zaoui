@@ -3,11 +3,11 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Album;
-use App\Entity\Media;
 use App\Form\AlbumType;
-use App\Form\MediaType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class AlbumController extends AbstractController
@@ -15,7 +15,7 @@ class AlbumController extends AbstractController
     /**
      * @Route("/admin/album", name="admin_album_index")
      */
-    public function index()
+    public function index(): Response
     {
         $albums = $this->getDoctrine()->getRepository(Album::class)->findAll();
 
@@ -62,7 +62,7 @@ class AlbumController extends AbstractController
     /**
      * @Route("/admin/album/delete/{id}", name="admin_album_delete")
      */
-    public function delete(int $id)
+    public function delete(int $id): RedirectResponse
     {
         $media = $this->getDoctrine()->getRepository(Album::class)->find($id);
         $this->getDoctrine()->getManager()->remove($media);
