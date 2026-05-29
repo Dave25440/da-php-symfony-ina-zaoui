@@ -15,6 +15,7 @@ return RectorConfig::configure()
     ])
     ->withPhpSets(php82: true)
     ->withPreparedSets(
+        deadCode: true,
         typeDeclarations: true,
         typeDeclarationDocblocks: true,
         doctrineCodeQuality: true,
