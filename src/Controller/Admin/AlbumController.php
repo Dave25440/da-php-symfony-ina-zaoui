@@ -25,7 +25,7 @@ class AlbumController extends AbstractController
     /**
      * @Route("/admin/album/add", name="admin_album_add")
      */
-    public function add(Request $request)
+    public function add(Request $request): RedirectResponse|Response
     {
         $album = new Album();
         $form = $this->createForm(AlbumType::class, $album);
@@ -44,7 +44,7 @@ class AlbumController extends AbstractController
     /**
      * @Route("/admin/album/update/{id}", name="admin_album_update")
      */
-    public function update(Request $request, int $id)
+    public function update(Request $request, int $id): RedirectResponse|Response
     {
         $album = $this->getDoctrine()->getRepository(Album::class)->find($id);
         $form = $this->createForm(AlbumType::class, $album);

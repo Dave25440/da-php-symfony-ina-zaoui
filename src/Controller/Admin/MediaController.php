@@ -43,7 +43,7 @@ class MediaController extends AbstractController
     /**
      * @Route("/admin/media/add", name="admin_media_add")
      */
-    public function add(Request $request)
+    public function add(Request $request): RedirectResponse|Response
     {
         $media = new Media();
         $form = $this->createForm(MediaType::class, $media, ['is_admin' => $this->isGranted('ROLE_ADMIN')]);
