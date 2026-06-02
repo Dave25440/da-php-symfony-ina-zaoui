@@ -15,8 +15,8 @@ use Symfony\Component\Routing\Attribute\Route;
 class AlbumController extends AbstractController
 {
     public function __construct(
-        private AlbumRepository $albumRepository,
-        private EntityManagerInterface $manager,
+        private readonly AlbumRepository $albumRepository,
+        private readonly EntityManagerInterface $manager,
     ) {}
 
     #[Route('/admin/album', name: 'admin_album_index')]
@@ -41,7 +41,7 @@ class AlbumController extends AbstractController
             return $this->redirectToRoute('admin_album_index');
         }
 
-        return $this->render('admin/album/add.html.twig', ['form' => $form->createView()]);
+        return $this->render('admin/album/add.html.twig', ['form' => $form]);
     }
 
     #[Route('/admin/album/update/{id}', name: 'admin_album_update')]
@@ -57,7 +57,7 @@ class AlbumController extends AbstractController
             return $this->redirectToRoute('admin_album_index');
         }
 
-        return $this->render('admin/album/update.html.twig', ['form' => $form->createView()]);
+        return $this->render('admin/album/update.html.twig', ['form' => $form]);
     }
 
     #[Route('/admin/album/delete/{id}', name: 'admin_album_delete')]

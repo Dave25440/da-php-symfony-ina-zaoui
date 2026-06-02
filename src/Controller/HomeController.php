@@ -12,9 +12,9 @@ use Symfony\Component\Routing\Attribute\Route;
 class HomeController extends AbstractController
 {
     public function __construct(
-        private UserRepository $userRepository,
-        private AlbumRepository $albumRepository,
-        private MediaRepository $mediaRepository,
+        private readonly UserRepository $userRepository,
+        private readonly AlbumRepository $albumRepository,
+        private readonly MediaRepository $mediaRepository,
     ) {}
 
     #[Route('/', name: 'home')]

@@ -15,8 +15,8 @@ use Symfony\Component\Routing\Attribute\Route;
 class MediaController extends AbstractController
 {
     public function __construct(
-        private MediaRepository $mediaRepository,
-        private EntityManagerInterface $manager,
+        private readonly MediaRepository $mediaRepository,
+        private readonly EntityManagerInterface $manager,
     ) {}
 
     #[Route('/admin/media', name: 'admin_media_index')]
@@ -66,7 +66,7 @@ class MediaController extends AbstractController
             return $this->redirectToRoute('admin_media_index');
         }
 
-        return $this->render('admin/media/add.html.twig', ['form' => $form->createView()]);
+        return $this->render('admin/media/add.html.twig', ['form' => $form]);
     }
 
     #[Route('/admin/media/delete/{id}', name: 'admin_media_delete')]
