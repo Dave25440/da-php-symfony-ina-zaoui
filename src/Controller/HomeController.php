@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Album;
+use App\Entity\User;
 use App\Repository\AlbumRepository;
 use App\Repository\MediaRepository;
 use App\Repository\UserRepository;
@@ -34,20 +36,17 @@ class HomeController extends AbstractController
     }
 
     #[Route('/guests/{id}', name: 'guest')]
-    public function guest(int $id): Response
+    public function guest(User $guest): Response
     {
-        $guest = $this->userRepository->find($id);
-
         return $this->render('front/guest.html.twig', [
             'guest' => $guest
         ]);
     }
 
-    #[Route('/portfolio/{id}', name: 'portfolio')]
-    public function portfolio(?int $id = null): Response
+    #[Route('/portfolio/{id?}', name: 'portfolio')]
+    public function portfolio(?Album $album = null): Response
     {
         $albums = $this->albumRepository->findAll();
-        $album = $id ? $this->albumRepository->find($id) : null;
         $user = $this->userRepository->findOneByAdmin(true);
 
         $medias = $album

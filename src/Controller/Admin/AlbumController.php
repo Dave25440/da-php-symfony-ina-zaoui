@@ -45,9 +45,8 @@ class AlbumController extends AbstractController
     }
 
     #[Route('/admin/album/update/{id}', name: 'admin_album_update')]
-    public function update(Request $request, int $id): RedirectResponse|Response
+    public function update(Album $album, Request $request): RedirectResponse|Response
     {
-        $album = $this->albumRepository->find($id);
         $form = $this->createForm(AlbumType::class, $album);
         $form->handleRequest($request);
 
@@ -61,10 +60,9 @@ class AlbumController extends AbstractController
     }
 
     #[Route('/admin/album/delete/{id}', name: 'admin_album_delete')]
-    public function delete(int $id): RedirectResponse
+    public function delete(Album $album): RedirectResponse
     {
-        $media = $this->albumRepository->find($id);
-        $this->manager->remove($media);
+        $this->manager->remove($album);
         $this->manager->flush();
 
         return $this->redirectToRoute('admin_album_index');
