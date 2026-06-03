@@ -13,7 +13,7 @@ class SecurityController extends AbstractController
         private readonly AuthenticationUtils $authenticationUtils,
     ) {}
 
-    #[Route('/login', name: 'admin_login')]
+    #[Route('/login', name: 'admin_login', methods: ['GET', 'POST'])]
     public function login(): Response
     {
         $error = $this->authenticationUtils->getLastAuthenticationError();

@@ -19,7 +19,7 @@ class AlbumController extends AbstractController
         private readonly EntityManagerInterface $manager,
     ) {}
 
-    #[Route('/admin/album', name: 'admin_album_index')]
+    #[Route('/admin/album', name: 'admin_album_index', methods: ['GET'])]
     public function index(): Response
     {
         $albums = $this->albumRepository->findAll();
@@ -27,7 +27,7 @@ class AlbumController extends AbstractController
         return $this->render('admin/album/index.html.twig', ['albums' => $albums]);
     }
 
-    #[Route('/admin/album/add', name: 'admin_album_add')]
+    #[Route('/admin/album/add', name: 'admin_album_add', methods: ['GET', 'POST'])]
     public function add(Request $request): RedirectResponse|Response
     {
         $album = new Album();
@@ -44,7 +44,7 @@ class AlbumController extends AbstractController
         return $this->render('admin/album/add.html.twig', ['form' => $form]);
     }
 
-    #[Route('/admin/album/update/{id}', name: 'admin_album_update')]
+    #[Route('/admin/album/update/{id}', name: 'admin_album_update', methods: ['GET', 'POST'])]
     public function update(Album $album, Request $request): RedirectResponse|Response
     {
         $form = $this->createForm(AlbumType::class, $album);
@@ -59,7 +59,7 @@ class AlbumController extends AbstractController
         return $this->render('admin/album/update.html.twig', ['form' => $form]);
     }
 
-    #[Route('/admin/album/delete/{id}', name: 'admin_album_delete')]
+    #[Route('/admin/album/delete/{id}', name: 'admin_album_delete', methods: ['DELETE'])]
     public function delete(Album $album): RedirectResponse
     {
         $this->manager->remove($album);

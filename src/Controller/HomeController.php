@@ -19,13 +19,13 @@ class HomeController extends AbstractController
         private readonly MediaRepository $mediaRepository,
     ) {}
 
-    #[Route('/', name: 'home')]
+    #[Route('/', name: 'home', methods: ['GET'])]
     public function home(): Response
     {
         return $this->render('front/home.html.twig');
     }
 
-    #[Route('/guests', name: 'guests')]
+    #[Route('/guests', name: 'guests', methods: ['GET'])]
     public function guests(): Response
     {
         $guests = $this->userRepository->findBy(['admin' => false]);
@@ -35,7 +35,7 @@ class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/guests/{id}', name: 'guest')]
+    #[Route('/guests/{id}', name: 'guest', methods: ['GET'])]
     public function guest(User $guest): Response
     {
         return $this->render('front/guest.html.twig', [
@@ -43,7 +43,7 @@ class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/portfolio/{id?}', name: 'portfolio')]
+    #[Route('/portfolio/{id?}', name: 'portfolio', methods: ['GET'])]
     public function portfolio(?Album $album = null): Response
     {
         $albums = $this->albumRepository->findAll();
@@ -60,7 +60,7 @@ class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/about', name: 'about')]
+    #[Route('/about', name: 'about', methods: ['GET'])]
     public function about(): Response
     {
         return $this->render('front/about.html.twig');
