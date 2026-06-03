@@ -49,7 +49,7 @@ class HomeController extends AbstractController
         $albums = $this->albumRepository->findAll();
         $user = $this->userRepository->findOneByAdmin(true);
 
-        $medias = $album
+        $medias = $album !== null
             ? $this->mediaRepository->findByAlbum($album)
             : $this->mediaRepository->findByUser($user);
 
