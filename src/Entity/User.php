@@ -14,19 +14,19 @@ class User
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(name: 'id')]
     private ?int $id = null;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'admin')]
     private bool $admin = false;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'name')]
     private string $name;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[ORM\Column(name: 'description', type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(length: 180, unique: true)]
+    #[ORM\Column(name: 'email', length: 180, unique: true)]
     private string $email;
 
     /**

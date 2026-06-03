@@ -11,19 +11,21 @@ class Media
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(name: 'id')]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "medias", fetch: "EAGER")]
+    #[ORM\JoinColumn(name: 'user_id')]
     private ?User $user = null;
 
     #[ORM\ManyToOne(targetEntity: Album::class, fetch: "EAGER")]
+    #[ORM\JoinColumn(name: 'album_id')]
     private ?Album $album = null;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'path')]
     private string $path;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'title')]
     private string $title;
 
     private ?UploadedFile $file = null;

@@ -10,10 +10,10 @@ class Album
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(name: 'id')]
     private ?int $id = null;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'name')]
     private string $name;
 
     public function getId(): ?int
