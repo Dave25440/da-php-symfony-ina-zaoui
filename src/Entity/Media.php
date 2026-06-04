@@ -14,11 +14,11 @@ class Media
     #[ORM\Column(name: 'id')]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "medias", fetch: "EAGER")]
+    #[ORM\ManyToOne(inversedBy: 'medias')]
     #[ORM\JoinColumn(name: 'user_id')]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(targetEntity: Album::class, fetch: "EAGER")]
+    #[ORM\ManyToOne(inversedBy: 'medias')]
     #[ORM\JoinColumn(name: 'album_id')]
     private ?Album $album = null;
 
@@ -40,39 +40,11 @@ class Media
         return $this->user;
     }
 
-    public function setUser(?User $user): void
+    public function setUser(?User $user): static
     {
         $this->user = $user;
-    }
 
-    public function getPath(): string
-    {
-        return $this->path;
-    }
-
-    public function setPath(string $path): void
-    {
-        $this->path = $path;
-    }
-
-    public function getTitle(): string
-    {
-        return $this->title;
-    }
-
-    public function setTitle(string $title): void
-    {
-        $this->title = $title;
-    }
-
-    public function getFile(): ?UploadedFile
-    {
-        return $this->file;
-    }
-
-    public function setFile(?UploadedFile $file): void
-    {
-        $this->file = $file;
+        return $this;
     }
 
     public function getAlbum(): ?Album
@@ -80,8 +52,46 @@ class Media
         return $this->album;
     }
 
-    public function setAlbum(?Album $album): void
+    public function setAlbum(?Album $album): static
     {
         $this->album = $album;
+
+        return $this;
+    }
+
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    public function setPath(string $path): static
+    {
+        $this->path = $path;
+
+        return $this;
+    }
+
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): static
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getFile(): ?UploadedFile
+    {
+        return $this->file;
+    }
+
+    public function setFile(?UploadedFile $file): static
+    {
+        $this->file = $file;
+
+        return $this;
     }
 }
