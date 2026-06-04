@@ -7,27 +7,41 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-class User
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[UniqueEntity(fields: ['email'], message: 'Cette adresse email est déjà utilisée.')]
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id')]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'admin')]
-    private bool $admin = false;
+    #[ORM\Column(name: 'email', length: 180)]
+    private string $email;
+
+    /**
+     * @var list<string> The user roles
+     */
+    #[ORM\Column(name: 'roles')]
+    private array $roles = [];
+
+    /**
+     * @var string The hashed password
+     */
+    #[ORM\Column(name: 'password')]
+    private string $password;
 
     #[ORM\Column(name: 'name')]
     private string $name;
 
     #[ORM\Column(name: 'description', type: Types::TEXT, nullable: true)]
     private ?string $description = null;
-
-    #[ORM\Column(name: 'email', length: 180, unique: true)]
-    private string $email;
 
     /**
      * @var Collection<int, Media>
@@ -57,14 +71,82 @@ class User
         return $this;
     }
 
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        assert($this->email !== '');
+
+        return $this->email;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    /**
+     * @param list<string> $roles
+     */
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
+     */
+    public function __serialize(): array
+    {
+        $data = (array) $this;
+        $data["\0" . self::class . "\0password"] = hash('crc32c', $this->password);
+        
+        return $data;
+    }
+
+    #[\Deprecated]
+    public function eraseCredentials(): void
+    {
+        // @deprecated, to be removed when upgrading to Symfony 8
+    }
+
     public function getName(): string
     {
         return $this->name;
     }
 
-    public function setName(string $name): void
+    public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
     }
 
     public function getDescription(): ?string
@@ -72,9 +154,11 @@ class User
         return $this->description;
     }
 
-    public function setDescription(?string $description): void
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
     }
 
     /**
@@ -85,21 +169,25 @@ class User
         return $this->medias;
     }
 
-    /**
-     * @param Collection<int, Media> $medias
-     */
-    public function setMedias(Collection $medias): void
+    public function addMedia(Media $media): static
     {
-        $this->medias = $medias;
+        if (!$this->medias->contains($media)) {
+            $this->medias->add($media);
+            $media->setUser($this);
+        }
+
+        return $this;
     }
 
-    public function isAdmin(): bool
+    public function removeMedia(Media $media): static
     {
-        return $this->admin;
-    }
+        if ($this->medias->removeElement($media)) {
+            // set the owning side to null (unless already changed)
+            if ($media->getUser() === $this) {
+                $media->setUser(null);
+            }
+        }
 
-    public function setAdmin(bool $admin): void
-    {
-        $this->admin = $admin;
+        return $this;
     }
 }
