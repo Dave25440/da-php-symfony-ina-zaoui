@@ -84,9 +84,20 @@ class MediaController extends AbstractController
     #[Route('/admin/media/delete/{id}', name: 'admin_media_delete', methods: ['DELETE'])]
     public function delete(Media $media): RedirectResponse
     {
+        $user = $this->getUser();
+
+        if (!$this->isGranted('ROLE_ADMIN') && $media->getUser() !== $user) {
+            throw $this->createAccessDeniedException('Vous ne pouvez pas supprimer ce média.');
+        }
+
         $this->manager->remove($media);
         $this->manager->flush();
-        unlink($media->getPath());
+
+        $path = $media->getPath();
+
+        if ($path !== '' && file_exists($path)) {
+            unlink($path);
+        }
 
         return $this->redirectToRoute('admin_media_index');
     }
