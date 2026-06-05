@@ -1,9 +1,11 @@
 {% extends 'front.html.twig' %}
 
+{% block title %}{{ guest.name }}{% endblock %}
+
 {% block front %}
     <div class="row">
         <div class="col-12">
-            <h3 class="mb-4">{{ guest.name }}</h3>
+            <h1 class="mb-4">{{ block('title') }}</h1>
             <p class="mb-5 w-100">{{ guest.description }}</p>
             <div class="row">
                 {% for media in guest.medias %}
@@ -15,4 +17,3 @@
         </div>
     </div>
 {% endblock %}
-

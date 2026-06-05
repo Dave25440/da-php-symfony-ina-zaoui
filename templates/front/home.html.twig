@@ -1,14 +1,16 @@
 {% extends 'front.html.twig' %}
 
+{% block title %}Photographe{% endblock %}
+
 {% block front %}
     <div class="row align-items-stretch">
         <div class="col-6">
-            <img src="{{ asset('images/home.jpeg') }}" alt="Ina Zaoui" class="home-img w-100">
+            <img src="{{ asset('images/home.jpeg') }}" alt="Coucher de soleil sur les dunes de sable" class="home-img w-100">
         </div>
         <div class="col-6">
             <div class="d-flex flex-column justify-content-center align-items-end h-100 gap-3">
                 <img src="{{ asset('images/name.png') }}" alt="Ina Zaoui">
-                <h2 class="home-title">Photographe</h2>
+                <h1 class="home-title">{{ block('title') }}</h1>
                 <p class="home-description">l'objectif errant des horizons sans limites, parcourt le globe uniquement au gré des murmures de la nature, capturant le souffle du monde dans des cadres silencieux.</p>
                 <a href="{{ path('portfolio') }}">découvrir</a>
             </div>

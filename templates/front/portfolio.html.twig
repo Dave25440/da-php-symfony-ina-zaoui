@@ -1,9 +1,11 @@
 {% extends 'front.html.twig' %}
 
+{% block title %}Portfolio{% endblock %}
+
 {% block front %}
     <div class="row">
         <div class="col-12">
-            <h3 class="mb-4">Portfolio</h3>
+            <h1 class="mb-4">{{ block('title') }}</h1>
             <div class="mb-5 row">
                 <div class="col-2">
                     <a class="btn w-100 py-3 {{ album is null ? 'active' }}" href="{{ path('portfolio') }}">
@@ -29,4 +31,3 @@
         </div>
     </div>
 {% endblock %}
-

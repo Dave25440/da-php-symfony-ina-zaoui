@@ -1,5 +1,7 @@
 {% extends 'front.html.twig' %}
 
+{% block title %}Qui suis-je ?{% endblock %}
+
 {% block front %}
     <div class="row align-items-stretch justify-content-center">
         <div class="col-4">
@@ -7,7 +9,7 @@
         </div>
         <div class="col-4">
             <div class="d-flex flex-column justify-content-center align-items-start h-100 gap-3 ps-5">
-                <h2 class="about-title">Qui suis-je ?</h2>
+                <h1 class="about-title">{{ block('title') }}</h1>
                 <p class="about-description">
                     Ina Zaoui est une photographe globe-trotteuse, réputée pour son engagement à explorer les paysages du monde entier en utilisant exclusivement des moyens non motorisés tels que la marche, le vélo ou la voile.
                     <br>

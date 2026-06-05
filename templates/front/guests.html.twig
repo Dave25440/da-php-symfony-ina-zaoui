@@ -1,13 +1,15 @@
 {% extends 'front.html.twig' %}
 
+{% block title %}Invités{% endblock %}
+
 {% block front %}
     <div class="row">
         <div class="col-12">
-            <h3 class="mb-5">Invités</h3>
+            <h1 class="mb-5">{{ block('title') }}</h1>
             <div class="guests d-flex flex-column">
                 {% for guest in guests %}
                     <div class="guest py-5 d-flex justify-content-between align-items-center">
-                        <h4>{{ guest.name }} ({{ guest.medias|length }})</h4>
+                        <h2>{{ guest.name }} ({{ guest.medias|length }})</h2>
                         <a href="{{ path('guest', {id: guest.id}) }}">découvrir</a>
                     </div>
                 {% endfor %}
@@ -15,4 +17,3 @@
         </div>
     </div>
 {% endblock %}
-
