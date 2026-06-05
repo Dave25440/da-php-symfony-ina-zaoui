@@ -44,6 +44,34 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         $qb = $this->createQueryBuilder('u');
 
+        $roleLike = '%"' . $role . '"%';
+
+        if ($hasRole) {
+            $qb->andWhere('u.roles LIKE :role');
+        } else {
+            $qb->andWhere('u.roles NOT LIKE :role');
+        }
+
+        $qb->setParameter('role', $roleLike);
+
+        if ($limit !== null) {
+            $qb->setMaxResults($limit);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @param string $role
+     * @param bool $hasRole
+     * @param int|null $limit
+     *
+     * @return User[]
+     */
+    public function findByRoleUsingJsonContains(string $role, bool $hasRole, ?int $limit = null): array
+    {
+        $qb = $this->createQueryBuilder('u');
+
         $operator = $hasRole ? '= 1' : '= 0';
         $qb->andWhere("JSON_CONTAINS(u.roles, :role) $operator")
         ->setParameter('role', json_encode($role));
