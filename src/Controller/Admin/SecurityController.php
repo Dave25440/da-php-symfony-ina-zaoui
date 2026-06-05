@@ -13,15 +13,24 @@ class SecurityController extends AbstractController
         private readonly AuthenticationUtils $authenticationUtils,
     ) {}
 
-    #[Route('/login', name: 'admin_login', methods: ['GET', 'POST'])]
+    #[Route(path: '/login', name: 'admin_login', methods: ['GET', 'POST'])]
     public function login(): Response
     {
+        // get the login error if there is one
         $error = $this->authenticationUtils->getLastAuthenticationError();
+
+        // last username entered by the user
         $lastUsername = $this->authenticationUtils->getLastUsername();
 
         return $this->render('admin/login.html.twig', [
             'last_username' => $lastUsername,
-            'error'         => $error,
+            'error' => $error,
         ]);
+    }
+
+    #[Route(path: '/logout', name: 'admin_logout')]
+    public function logout(): void
+    {
+        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 }
