@@ -27,7 +27,7 @@
                         <td>{{ media.album.name ?? '' }}</td>
                     {% endif %}
                     <td>
-                        <form action="{{ path('admin_media_delete', {id: media.id}) }}" method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer ce média ?');">
+                        <form action="{{ path('admin_media_delete', {id: media.id}) }}" method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer ce média ?');" class="d-inline">
                             <input type="hidden" name="_method" value="delete">
                             <button type="submit" class="btn btn-danger">Supprimer</button>
                         </form>

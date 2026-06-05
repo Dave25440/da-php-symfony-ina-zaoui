@@ -18,7 +18,10 @@
                 <td>{{ album.name }}</td>
                 <td>
                     <a href="{{ path('admin_album_update', {id: album.id}) }}" class="btn btn-warning">Modifier</a>
-                    <a href="{{ path('admin_album_delete', {id: album.id}) }}" class="btn btn-danger">Supprimer</a>
+                    <form action="{{ path('admin_album_delete', {id: album.id}) }}" method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer cet album ?');" class="d-inline">
+                        <input type="hidden" name="_method" value="delete">
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </form>
                 </td>
             </tr>
         {% endfor %}
