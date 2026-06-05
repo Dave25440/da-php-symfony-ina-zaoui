@@ -13,21 +13,27 @@
         <div class="row min-vh-100 align-items-center justify-content-center">
             <nav class="col-md-6 col-lg-4">
                 <div class="position-sticky">
-                    <h1 class="text-white">Connexion</h1>
-                    {% if error %}
-                        <div class="alert alert-danger" role="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                    <h1 class="mb-3">Connexion</h1>
+                    {% if app.user %}
+                        <p class="mb-3">Vous êtes connecté(e) en tant que {{ app.user.name }}.</p>
+                        <a href="{{ logout_path() }}" class="btn btn-primary">Se déconnecter</a>
+                    {% else %}
+                        <form method="post">
+                            {% if error %}
+                                <div class="alert alert-danger" role="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                            {% endif %}
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Adresse email</label>
+                                <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Mot de passe</label>
+                                <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
+                                <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Se connecter</button>
+                        </form>
                     {% endif %}
-                    <form method="post">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Nom d'utilisateur</label>
-                            <input type="text" class="form-control" id="username" name="_username" value="{{ last_username }}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Mot de passe</label>
-                            <input type="password" class="form-control" id="password" name="_password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Connexion</button>
-                    </form>
                 </div>
             </nav>
             <main class="col-md-9 ms-sm-auto col-lg-10 p-4">
