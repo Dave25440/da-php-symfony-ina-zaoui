@@ -16,7 +16,7 @@ parameters:
         - var/cache/dev/Symfony/Config
     doctrine:
         objectManagerLoader: tests/object-manager.php
-    level: 9
+    level: 10
     paths:
         - bin/
         - config/
