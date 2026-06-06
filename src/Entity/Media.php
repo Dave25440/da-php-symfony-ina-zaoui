@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\MediaRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
 class Media
@@ -26,8 +27,22 @@ class Media
     private string $path;
 
     #[ORM\Column(name: 'title')]
+    #[Assert\NotBlank(message: 'Le titre est obligatoire.')]
+    #[Assert\Length(
+        min: 2,
+        minMessage: 'Le titre doit contenir au moins {{ limit }} caractères.',
+        max: 100,
+        maxMessage: 'Le titre ne doit pas dépasser {{ limit }} caractères.'
+    )]
     private string $title;
 
+    #[Assert\NotNull(message: 'L\'image est obligatoire.')]
+    #[Assert\File(
+        maxSize: '2M',
+        maxSizeMessage: 'La taille de l\'image ne doit pas dépasser {{ limit }} {{ suffix }}.',
+        extensions: ['jpg', 'jpeg', 'png', 'webp'],
+        extensionsMessage: 'L\'image doit être au format {{ extensions }}.'
+    )]
     private ?UploadedFile $file = null;
 
     public function getId(): ?int

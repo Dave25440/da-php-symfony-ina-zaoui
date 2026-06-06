@@ -6,6 +6,7 @@ use App\Repository\AlbumRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AlbumRepository::class)]
 class Album
@@ -16,6 +17,13 @@ class Album
     private ?int $id = null;
 
     #[ORM\Column(name: 'name')]
+    #[Assert\NotBlank(message: 'Le nom est obligatoire.')]
+    #[Assert\Length(
+        min: 2,
+        minMessage: 'Le nom doit contenir au moins {{ limit }} caractères.',
+        max: 100,
+        maxMessage: 'Le nom ne doit pas dépasser {{ limit }} caractères.'
+    )]
     private string $name;
 
     /**
