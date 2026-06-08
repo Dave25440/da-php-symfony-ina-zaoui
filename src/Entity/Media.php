@@ -37,11 +37,11 @@ class Media
     private string $title;
 
     #[Assert\NotNull(message: 'L\'image est obligatoire.')]
-    #[Assert\File(
+    #[Assert\Image(
         maxSize: '2M',
         maxSizeMessage: 'La taille de l\'image ne doit pas dépasser {{ limit }} {{ suffix }}.',
-        extensions: ['jpg', 'jpeg', 'png', 'webp'],
-        extensionsMessage: 'L\'image doit être au format {{ extensions }}.'
+        mimeTypes: ['image/jpg', 'image/jpeg', 'image/png', 'image/webp'],
+        mimeTypesMessage: 'L\'image doit être au format JPG, JPEG, PNG ou WebP.'
     )]
     private ?UploadedFile $file = null;
 
