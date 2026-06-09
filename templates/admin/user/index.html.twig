@@ -27,6 +27,17 @@
                     {% endif %}
                 </td>
                 <td>
+                    {% if 'ROLE_GUEST' in user.roles %}
+                        <form action="{{ path('admin_user_guest_disable', {id: user.id}) }}" method="post" class="d-inline">
+                            <input type="hidden" name="page" value="{{ app.request.query.get('page', 1) }}">
+                            <button type="submit" class="btn btn-warning">Bloquer l'accès</button>
+                        </form>
+                    {% else %}
+                        <form action="{{ path('admin_user_guest_enable', {id: user.id}) }}" method="post" class="d-inline">
+                            <input type="hidden" name="page" value="{{ app.request.query.get('page', 1) }}">
+                            <button type="submit" class="btn btn-success">Activer l'accès</button>
+                        </form>
+                    {% endif %}
                     <form action="#" method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer cet·te invité·e ?');" class="d-inline">
                         <input type="hidden" name="_method" value="delete">
                         <button type="submit" class="btn btn-danger">Supprimer</button>
