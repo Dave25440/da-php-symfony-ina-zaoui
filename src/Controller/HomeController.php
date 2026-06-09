@@ -28,7 +28,7 @@ final class HomeController extends AbstractController
     #[Route('/guests', name: 'guests', methods: ['GET'])]
     public function guests(): Response
     {
-        $guests = $this->userRepository->findByRole('ROLE_ADMIN', false);
+        $guests = $this->userRepository->findByRole('ROLE_GUEST', true);
 
         return $this->render('front/guests.html.twig', [
             'guests' => $guests
@@ -38,6 +38,10 @@ final class HomeController extends AbstractController
     #[Route('/guests/{id}', name: 'guest', methods: ['GET'])]
     public function guest(User $guest): Response
     {
+        if (!in_array('ROLE_GUEST', $guest->getRoles(), true)) {
+            throw $this->createNotFoundException('Invité·e introuvable.');
+        }
+
         return $this->render('front/guest.html.twig', [
             'guest' => $guest
         ]);
