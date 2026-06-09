@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -36,11 +37,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     /**
      * @param string $role
      * @param bool $hasRole
-     * @param int|null $limit
      *
-     * @return User[]
+     * @return QueryBuilder
      */
-    public function findByRole(string $role, bool $hasRole, ?int $limit = null): array
+    private function getRole(string $role, bool $hasRole): QueryBuilder
     {
         $qb = $this->createQueryBuilder('u');
 
@@ -54,8 +54,27 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         $qb->setParameter('role', $roleLike);
 
+        return $qb;
+    }
+
+    /**
+     * @param string $role
+     * @param bool $hasRole
+     * @param int|null $limit
+     * @param int|null $offset
+     *
+     * @return User[]
+     */
+    public function findByRole(string $role, bool $hasRole, ?int $limit = null, ?int $offset = null): array
+    {
+        $qb = $this->getRole($role, $hasRole);
+
         if ($limit !== null) {
             $qb->setMaxResults($limit);
+        }
+
+        if ($offset !== null) {
+            $qb->setFirstResult($offset);
         }
 
         return $qb->getQuery()->getResult();
@@ -64,24 +83,33 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     /**
      * @param string $role
      * @param bool $hasRole
-     * @param int|null $limit
      *
-     * @return User[]
+     * @return int
      */
-    public function findByRoleUsingJsonContains(string $role, bool $hasRole, ?int $limit = null): array
+    public function countByRole(string $role, bool $hasRole): int
     {
-        $qb = $this->createQueryBuilder('u');
+        $qb = $this->getRole($role, $hasRole)
+            ->select('COUNT(u.id)');
 
-        $operator = $hasRole ? '= 1' : '= 0';
-        $qb->andWhere("JSON_CONTAINS(u.roles, :role) $operator")
-        ->setParameter('role', json_encode($role));
-
-        if ($limit !== null) {
-            $qb->setMaxResults($limit);
-        }
-
-        return $qb->getQuery()->getResult();
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
+
+//    /**
+//    * @param string $role
+//    * @param bool $hasRole
+//    *
+//    * @return QueryBuilder
+//    */
+//    private function getRoleUsingJsonContains(string $role, bool $hasRole): QueryBuilder
+//    {
+//        $qb = $this->createQueryBuilder('u');
+//
+//        $operator = $hasRole ? '= 1' : '= 0';
+//        $qb->andWhere("JSON_CONTAINS(u.roles, :role) $operator")
+//        ->setParameter('role', json_encode($role));
+//
+//        return $qb;
+//    }
 
 //    /**
 //     * @return User[] Returns an array of User objects
