@@ -5,26 +5,30 @@
         <h2 class="h1">Albums</h2>
         <a href="{{ path('admin_album_add') }}" class="btn btn-primary">Ajouter</a>
     </div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Nom</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for album in albums %}
-            <tr>
-                <td>{{ album.name }}</td>
-                <td>
-                    <a href="{{ path('admin_album_update', {id: album.id}) }}" class="btn btn-warning">Modifier</a>
-                    <form action="{{ path('admin_album_delete', {id: album.id}) }}" method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer cet album ?');" class="d-inline">
-                        <input type="hidden" name="_method" value="delete">
-                        <button type="submit" class="btn btn-danger">Supprimer</button>
-                    </form>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    {% if albums is empty %}
+        <p>Aucun album disponible.</p>
+    {% else %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for album in albums %}
+                <tr>
+                    <td>{{ album.name }}</td>
+                    <td>
+                        <a href="{{ path('admin_album_update', {id: album.id}) }}" class="btn btn-warning">Modifier</a>
+                        <form action="{{ path('admin_album_delete', {id: album.id}) }}" method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer cet album ?');" class="d-inline">
+                            <input type="hidden" name="_method" value="delete">
+                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 {% endblock %}
