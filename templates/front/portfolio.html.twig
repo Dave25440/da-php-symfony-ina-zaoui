@@ -26,6 +26,8 @@
                         <img class="w-100" src="{{ asset(media.path) }}" alt="{{ media.title }}">
                         <p class="text-center mb-0 mt-2 media-title">{{ media.title }}</p>
                     </div>
+                {% else %}
+                    <p>Aucun média disponible.</p>
                 {% endfor %}
             </div>
         </div>

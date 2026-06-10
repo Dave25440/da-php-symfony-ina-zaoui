@@ -12,6 +12,8 @@
                         <h2>{{ guest.name }} ({{ guest.medias|length }})</h2>
                         <a href="{{ path('guest', {id: guest.id}) }}">découvrir</a>
                     </div>
+                {% else %}
+                    <p>Aucun invité disponible.</p>
                 {% endfor %}
             </div>
         </div>
