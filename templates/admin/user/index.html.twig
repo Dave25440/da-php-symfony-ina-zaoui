@@ -38,8 +38,9 @@
                             <button type="submit" class="btn btn-success">Activer l'accès</button>
                         </form>
                     {% endif %}
-                    <form action="#" method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer cet·te invité·e ?');" class="d-inline">
+                    <form action="{{ path('admin_user_delete', {id: user.id}) }}" method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer cet·te invité·e ?');" class="d-inline">
                         <input type="hidden" name="_method" value="delete">
+                        <input type="hidden" name="page" value="{{ app.request.query.get('page', 1) }}">
                         <button type="submit" class="btn btn-danger">Supprimer</button>
                     </form>
                 </td>

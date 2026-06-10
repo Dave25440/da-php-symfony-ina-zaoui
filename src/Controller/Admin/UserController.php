@@ -77,7 +77,7 @@ final class UserController extends AbstractController
      * @param User $user
      * @return Response
      */
-    #[Route('/admin/user/{id}/guest/disable', name: 'admin_user_guest_disable', methods: ['POST'])]
+    #[Route('/admin/user/guest/disable/{id}', name: 'admin_user_guest_disable', methods: ['POST'])]
     public function disableGuestAccess(User $user, Request $request): Response
     {
         $roles = $user->getRoles();
@@ -102,7 +102,7 @@ final class UserController extends AbstractController
      * @param User $user
      * @return Response
      */
-    #[Route('/admin/user/{id}/guest/enable', name: 'admin_user_guest_enable', methods: ['POST'])]
+    #[Route('/admin/user/guest/enable/{id}', name: 'admin_user_guest_enable', methods: ['POST'])]
     public function enableGuestAccess(User $user, Request $request): Response
     {
         $roles = $user->getRoles();
@@ -115,6 +115,17 @@ final class UserController extends AbstractController
             $this->manager->persist($user);
             $this->manager->flush();
         }
+
+        $page = $request->request->get('page', 1);
+
+        return $this->redirectToRoute('admin_user_index', ['page' => $page]);
+    }
+
+    #[Route('/admin/user/delete/{id}', name: 'admin_user_delete', methods: ['DELETE'])]
+    public function delete(User $user, Request $request): Response
+    {
+        $this->manager->remove($user);
+        $this->manager->flush();
 
         $page = $request->request->get('page', 1);
 
