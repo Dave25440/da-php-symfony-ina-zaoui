@@ -7,6 +7,7 @@ use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -19,6 +20,12 @@ final class UserController extends AbstractController
         private readonly EntityManagerInterface $manager,
     ) {}
 
+    /**
+     * Affiche la liste des invité·es.
+     *
+     * @param Request $request
+     * @return Response
+     */
     #[Route('/admin/user', name: 'admin_user_index', methods: ['GET'])]
     public function index(Request $request): Response
     {
@@ -48,8 +55,15 @@ final class UserController extends AbstractController
         ]);
     }
 
+    /**
+     * Ajoute un·e invité·e.
+     *
+     * @param Request $request
+     * @param UserPasswordHasherInterface $userPasswordHasher
+     * @return RedirectResponse|Response
+     */
     #[Route('/admin/user/add', name: 'admin_user_add', methods: ['GET', 'POST'])]
-    public function add(Request $request, UserPasswordHasherInterface $userPasswordHasher): Response
+    public function add(Request $request, UserPasswordHasherInterface $userPasswordHasher): RedirectResponse|Response
     {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
@@ -79,12 +93,13 @@ final class UserController extends AbstractController
 
     /**
      * Désactive l'accès de l'invité·e.
-     * 
+     *
      * @param User $user
-     * @return Response
+     * @param Request $request
+     * @return RedirectResponse
      */
     #[Route('/admin/user/guest/disable/{id}', name: 'admin_user_guest_disable', methods: ['POST'])]
-    public function disableGuestAccess(User $user, Request $request): Response
+    public function disableGuestAccess(User $user, Request $request): RedirectResponse
     {
         $roles = $user->getRoles();
 
@@ -104,12 +119,13 @@ final class UserController extends AbstractController
 
     /**
      * Active l'accès de l'invité·e.
-     * 
+     *
      * @param User $user
-     * @return Response
+     * @param Request $request
+     * @return RedirectResponse
      */
     #[Route('/admin/user/guest/enable/{id}', name: 'admin_user_guest_enable', methods: ['POST'])]
-    public function enableGuestAccess(User $user, Request $request): Response
+    public function enableGuestAccess(User $user, Request $request): RedirectResponse
     {
         $roles = $user->getRoles();
 
@@ -127,8 +143,15 @@ final class UserController extends AbstractController
         return $this->redirectToRoute('admin_user_index', ['page' => $page]);
     }
 
+    /**
+     * Supprime l'invité·e.
+     *
+     * @param User $user
+     * @param Request $request
+     * @return RedirectResponse
+     */
     #[Route('/admin/user/delete/{id}', name: 'admin_user_delete', methods: ['DELETE'])]
-    public function delete(User $user, Request $request): Response
+    public function delete(User $user, Request $request): RedirectResponse
     {
         $this->manager->remove($user);
         $this->manager->flush();

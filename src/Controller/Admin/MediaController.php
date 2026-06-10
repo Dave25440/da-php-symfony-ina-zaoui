@@ -20,6 +20,12 @@ final class MediaController extends AbstractController
         private readonly EntityManagerInterface $manager,
     ) {}
 
+    /**
+     * Affiche la liste des médias.
+     *
+     * @param Request $request
+     * @return Response
+     */
     #[Route('/admin/media', name: 'admin_media_index', methods: ['GET'])]
     public function index(Request $request): Response
     {
@@ -55,6 +61,12 @@ final class MediaController extends AbstractController
         ]);
     }
 
+    /**
+     * Ajoute un média.
+     *
+     * @param Request $request
+     * @return RedirectResponse|Response
+     */
     #[Route('/admin/media/add', name: 'admin_media_add', methods: ['GET', 'POST'])]
     public function add(Request $request): RedirectResponse|Response
     {
@@ -87,6 +99,13 @@ final class MediaController extends AbstractController
         return $this->render('admin/media/add.html.twig', ['form' => $form]);
     }
 
+    /**
+     * Supprime le média.
+     *
+     * @param Media $media
+     * @param Request $request
+     * @return RedirectResponse
+     */
     #[Route('/admin/media/delete/{id}', name: 'admin_media_delete', methods: ['DELETE'])]
     public function delete(Media $media, Request $request): RedirectResponse
     {

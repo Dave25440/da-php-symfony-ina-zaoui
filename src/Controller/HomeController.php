@@ -19,12 +19,22 @@ final class HomeController extends AbstractController
         private readonly MediaRepository $mediaRepository,
     ) {}
 
+    /**
+     * Affiche la page d'accueil.
+     *
+     * @return Response
+     */
     #[Route('/', name: 'home', methods: ['GET'])]
     public function home(): Response
     {
         return $this->render('front/home.html.twig');
     }
 
+    /**
+     * Affiche la page "Invités".
+     *
+     * @return Response
+     */
     #[Route('/guests', name: 'guests', methods: ['GET'])]
     public function guests(): Response
     {
@@ -35,6 +45,12 @@ final class HomeController extends AbstractController
         ]);
     }
 
+    /**
+     * Affiche la page de l'invité·e.
+     *
+     * @param User $guest
+     * @return Response
+     */
     #[Route('/guests/{id}', name: 'guest', methods: ['GET'])]
     public function guest(User $guest): Response
     {
@@ -47,6 +63,12 @@ final class HomeController extends AbstractController
         ]);
     }
 
+    /**
+     * Affiche la page "Portfolio".
+     *
+     * @param Album|null $album
+     * @return Response
+     */
     #[Route('/portfolio/{id?}', name: 'portfolio', methods: ['GET'])]
     public function portfolio(?Album $album = null): Response
     {
@@ -65,6 +87,11 @@ final class HomeController extends AbstractController
         ]);
     }
 
+    /**
+     * Affiche la page "Qui suis-je ?".
+     *
+     * @return Response
+     */
     #[Route('/about', name: 'about', methods: ['GET'])]
     public function about(): Response
     {
