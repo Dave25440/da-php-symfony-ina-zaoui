@@ -1,0 +1,35 @@
+{% if totalPages > 1 %}
+    <nav aria-label="Navigation entre les pages">
+        <ul class="pagination">
+        {% if page > 2 %}
+            <li class="page-item">
+                <a class="page-link" href="{{ path(pathName, {page: 1}) }}">Première page</a>
+            </li>
+        {% endif %}
+
+        {% if page > 1 %}
+            <li class="page-item">
+                <a class="page-link" href="{{ path(pathName, {page: page - 1}) }}">Précédent</a>
+            </li>
+        {% endif %}
+
+        {% for i in range(max(1, page - 3), min(totalPages, page + 3)) %}
+            <li class="page-item {% if i == page %}active{% endif %}">
+                <a class="page-link" href="{{ path(pathName, {page: i}) }}">{{ i }}</a>
+            </li>
+        {% endfor %}
+
+        {% if page < totalPages %}
+            <li class="page-item">
+                <a class="page-link" href="{{ path(pathName, {page: page + 1}) }}">Suivant</a>
+            </li>
+        {% endif %}
+
+        {% if page < totalPages - 1 %}
+            <li class="page-item">
+                <a class="page-link" href="{{ path(pathName, {page: totalPages}) }}">Dernière page</a>
+            </li>
+        {% endif %}
+        </ul>
+    </nav>
+{% endif %}

@@ -40,12 +40,18 @@ final class MediaController extends AbstractController
         );
 
         $total = $this->mediaRepository->count($criteria);
+        $totalPages = (int) ceil($total / $limit);
+
+        if ($totalPages < 1) {
+            $totalPages = 1;
+        }
 
         return $this->render('admin/media/index.html.twig', [
             'medias' => $medias,
             'total' => $total,
             'page' => $page,
             'limit' => $limit,
+            'totalPages' => $totalPages,
         ]);
     }
 
@@ -82,7 +88,7 @@ final class MediaController extends AbstractController
     }
 
     #[Route('/admin/media/delete/{id}', name: 'admin_media_delete', methods: ['DELETE'])]
-    public function delete(Media $media): RedirectResponse
+    public function delete(Media $media, Request $request): RedirectResponse
     {
         $user = $this->getUser();
 
@@ -99,6 +105,8 @@ final class MediaController extends AbstractController
             unlink($path);
         }
 
-        return $this->redirectToRoute('admin_media_index');
+        $page = $request->request->get('page', 1);
+
+        return $this->redirectToRoute('admin_media_index', ['page' => $page]);
     }
 }
