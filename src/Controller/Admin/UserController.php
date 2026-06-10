@@ -33,12 +33,18 @@ final class UserController extends AbstractController
         );
 
         $total = $this->userRepository->countByRole('ROLE_ADMIN', false);
+        $totalPages = (int) ceil($total / $limit);
+
+        if ($totalPages < 1) {
+            $totalPages = 1;
+        }
 
         return $this->render('admin/user/index.html.twig', [
             'users' => $users,
             'total' => $total,
             'page' => $page,
             'limit' => $limit,
+            'totalPages' => $totalPages,
         ]);
     }
 

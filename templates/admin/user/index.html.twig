@@ -5,83 +5,57 @@
         <h2 class="h1">Invités</h2>
         <a href="{{ path('admin_user_add') }}" class="btn btn-primary">Ajouter</a>
     </div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Nom</th>
-                <th>Adresse email</th>
-                <th>Statut</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for user in users %}
-            <tr>
-                <td>{{ user.name }}</td>
-                <td>{{ user.email }}</td>
-                <td>
-                    {% if 'ROLE_GUEST' in user.roles %}
-                        Actif·ve
-                    {% else %}
-                        Bloqué·e
-                    {% endif %}
-                </td>
-                <td>
-                    {% if 'ROLE_GUEST' in user.roles %}
-                        <form action="{{ path('admin_user_guest_disable', {id: user.id}) }}" method="post" class="d-inline">
+    {% if users is empty %}
+        <p>Aucun invité disponible.</p>
+    {% else %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Adresse email</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        {% if 'ROLE_GUEST' in user.roles %}
+                            Actif·ve
+                        {% else %}
+                            Bloqué·e
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if 'ROLE_GUEST' in user.roles %}
+                            <form action="{{ path('admin_user_guest_disable', {id: user.id}) }}" method="post" class="d-inline">
+                                <input type="hidden" name="page" value="{{ app.request.query.get('page', 1) }}">
+                                <button type="submit" class="btn btn-warning">Bloquer l'accès</button>
+                            </form>
+                        {% else %}
+                            <form action="{{ path('admin_user_guest_enable', {id: user.id}) }}" method="post" class="d-inline">
+                                <input type="hidden" name="page" value="{{ app.request.query.get('page', 1) }}">
+                                <button type="submit" class="btn btn-success">Activer l'accès</button>
+                            </form>
+                        {% endif %}
+                        <form action="{{ path('admin_user_delete', {id: user.id}) }}" method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer cet·te invité·e ?');" class="d-inline">
+                            <input type="hidden" name="_method" value="delete">
                             <input type="hidden" name="page" value="{{ app.request.query.get('page', 1) }}">
-                            <button type="submit" class="btn btn-warning">Bloquer l'accès</button>
+                            <button type="submit" class="btn btn-danger">Supprimer</button>
                         </form>
-                    {% else %}
-                        <form action="{{ path('admin_user_guest_enable', {id: user.id}) }}" method="post" class="d-inline">
-                            <input type="hidden" name="page" value="{{ app.request.query.get('page', 1) }}">
-                            <button type="submit" class="btn btn-success">Activer l'accès</button>
-                        </form>
-                    {% endif %}
-                    <form action="{{ path('admin_user_delete', {id: user.id}) }}" method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer cet·te invité·e ?');" class="d-inline">
-                        <input type="hidden" name="_method" value="delete">
-                        <input type="hidden" name="page" value="{{ app.request.query.get('page', 1) }}">
-                        <button type="submit" class="btn btn-danger">Supprimer</button>
-                    </form>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-    {% set totalPages = (total / limit)|round(0, 'ceil') %}
-
-    <nav aria-label="Navigation entre les pages">
-        <ul class="pagination">
-        {% if page > 2 %}
-            <li class="page-item">
-                <a class="page-link" href="{{ path('admin_user_index', {page: 1}) }}">Première page</a>
-            </li>
-        {% endif %}
-
-        {% if page > 1 %}
-            <li class="page-item">
-                <a class="page-link" href="{{ path('admin_user_index', {page: page - 1}) }}">Précédent</a>
-            </li>
-        {% endif %}
-
-        {% for i in range(max(1, page - 3), min(totalPages, page + 3)) %}
-            <li class="page-item {% if i == page %}active{% endif %}">
-                <a class="page-link" href="{{ path('admin_user_index', {page: i}) }}">{{ i }}</a>
-            </li>
-        {% endfor %}
-
-        {% if page < totalPages %}
-            <li class="page-item">
-                <a class="page-link" href="{{ path('admin_user_index', {page: page + 1}) }}">Suivant</a>
-            </li>
-        {% endif %}
-
-        {% if page < totalPages - 1 %}
-            <li class="page-item">
-                <a class="page-link" href="{{ path('admin_user_index', {page: totalPages}) }}">Dernière page</a>
-            </li>
-        {% endif %}
-        </ul>
-    </nav>
+        {% include 'admin/_paging.html.twig' with {
+            pathName: 'admin_user_index',
+            page: page,
+            totalPages: totalPages
+        } %}
+    {% endif %}
 {% endblock %}
