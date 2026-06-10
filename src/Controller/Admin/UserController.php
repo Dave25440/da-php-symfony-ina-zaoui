@@ -15,10 +15,24 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class UserController extends AbstractController
 {
+    private int $limit = 25;
+
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly EntityManagerInterface $manager,
     ) {}
+
+    /**
+     * Récupère le nombre total de pages.
+     *
+     * @return int
+     */
+    private function getTotalPages(): int
+    {
+        $total = $this->userRepository->countByRole('ROLE_ADMIN', false);
+
+        return max(1, (int) ceil($total / $this->limit));
+    }
 
     /**
      * Affiche la liste des invité·es.
@@ -30,27 +44,20 @@ final class UserController extends AbstractController
     public function index(Request $request): Response
     {
         $page = $request->query->getInt('page', 1);
-        $limit = 25;
+
+        $totalPages = $this->getTotalPages();
+        $page = max(1, min($page, $totalPages));
 
         $users = $this->userRepository->findByRole(
             'ROLE_ADMIN',
             false,
-            $limit,
-            $limit * ($page - 1)
+            $this->limit,
+            $this->limit * ($page - 1)
         );
-
-        $total = $this->userRepository->countByRole('ROLE_ADMIN', false);
-        $totalPages = (int) ceil($total / $limit);
-
-        if ($totalPages < 1) {
-            $totalPages = 1;
-        }
 
         return $this->render('admin/user/index.html.twig', [
             'users' => $users,
-            'total' => $total,
             'page' => $page,
-            'limit' => $limit,
             'totalPages' => $totalPages,
         ]);
     }
@@ -79,11 +86,7 @@ final class UserController extends AbstractController
             $this->manager->persist($user);
             $this->manager->flush();
 
-            $limit = 25;
-            $total = $this->userRepository->countByRole('ROLE_ADMIN', false);
-            $lastPage = (int) ceil($total / $limit);
-
-            return $this->redirectToRoute('admin_user_index', ['page' => $lastPage]);
+            return $this->redirectToRoute('admin_user_index', ['page' => $this->getTotalPages()]);
         }
 
         return $this->render('admin/user/add.html.twig', [
