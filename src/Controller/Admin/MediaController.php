@@ -98,11 +98,18 @@ final class MediaController extends AbstractController
                 }
             }
 
+            $uploads = 'uploads/';
+
+            if (!is_dir($uploads)) {
+                mkdir($uploads, 0755, true);
+            }
+
             $file = $media->getFile();
 
             if ($file !== null) {
-                $media->setPath('uploads/' . md5(uniqid()) . '.' . $file->guessExtension());
-                $file->move('uploads/', $media->getPath());
+                $fileName = md5(uniqid()) . '.' . $file->guessExtension();
+                $media->setPath($uploads . $fileName);
+                $file->move($uploads, $fileName);
             }
 
             $this->manager->persist($media);
