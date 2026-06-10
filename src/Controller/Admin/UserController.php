@@ -3,11 +3,13 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class UserController extends AbstractController
@@ -37,6 +39,35 @@ final class UserController extends AbstractController
             'total' => $total,
             'page' => $page,
             'limit' => $limit,
+        ]);
+    }
+
+    #[Route('/admin/user/add', name: 'admin_user_add', methods: ['GET', 'POST'])]
+    public function add(Request $request, UserPasswordHasherInterface $userPasswordHasher): Response
+    {
+        $user = new User();
+        $form = $this->createForm(UserType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var string $plainPassword */
+            $plainPassword = $form->get('plainPassword')->getData();
+
+            $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
+            $user->setRoles(['ROLE_GUEST']);
+
+            $this->manager->persist($user);
+            $this->manager->flush();
+
+            $limit = 25;
+            $total = $this->userRepository->countByRole('ROLE_ADMIN', false);
+            $lastPage = (int) ceil($total / $limit);
+
+            return $this->redirectToRoute('admin_user_index', ['page' => $lastPage]);
+        }
+
+        return $this->render('admin/user/add.html.twig', [
+            'form' => $form,
         ]);
     }
 
