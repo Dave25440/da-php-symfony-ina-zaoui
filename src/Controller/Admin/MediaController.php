@@ -15,10 +15,38 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class MediaController extends AbstractController
 {
+    private int $limit = 25;
+
     public function __construct(
         private readonly MediaRepository $mediaRepository,
         private readonly EntityManagerInterface $manager,
     ) {}
+
+    /**
+     * Initialise les critères de filtrage pour les requêtes.
+     *
+     * @return array<string, mixed>
+     */
+    private function getCriteria(): array
+    {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return ['user' => $this->getUser()];
+        }
+
+        return [];
+    }
+
+    /**
+     * Récupère le nombre total de pages.
+     *
+     * @return int
+     */
+    private function getTotalPages(): int
+    {
+        $total = $this->mediaRepository->count($this->getCriteria());
+
+        return max(1, (int) ceil($total / $this->limit));
+    }
 
     /**
      * Affiche la liste des médias.
@@ -31,32 +59,19 @@ final class MediaController extends AbstractController
     {
         $page = $request->query->getInt('page', 1);
 
-        $criteria = [];
-        $limit = 25;
-
-        if (!$this->isGranted('ROLE_ADMIN')) {
-            $criteria['user'] = $this->getUser();
-        }
+        $totalPages = $this->getTotalPages();
+        $page = max(1, min($page, $totalPages));
 
         $medias = $this->mediaRepository->findBy(
-            $criteria,
+            $this->getCriteria(),
             ['id' => 'ASC'],
-            $limit,
-            $limit * ($page - 1)
+            $this->limit,
+            $this->limit * ($page - 1)
         );
-
-        $total = $this->mediaRepository->count($criteria);
-        $totalPages = (int) ceil($total / $limit);
-
-        if ($totalPages < 1) {
-            $totalPages = 1;
-        }
 
         return $this->render('admin/media/index.html.twig', [
             'medias' => $medias,
-            'total' => $total,
             'page' => $page,
-            'limit' => $limit,
             'totalPages' => $totalPages,
         ]);
     }
@@ -93,7 +108,7 @@ final class MediaController extends AbstractController
             $this->manager->persist($media);
             $this->manager->flush();
 
-            return $this->redirectToRoute('admin_media_index');
+            return $this->redirectToRoute('admin_media_index', ['page' => $this->getTotalPages()]);
         }
 
         return $this->render('admin/media/add.html.twig', ['form' => $form]);
