@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Media
 {
     #[ORM\Id]
@@ -44,6 +45,16 @@ class Media
         mimeTypesMessage: 'L\'image doit être au format JPG, JPEG, PNG ou WebP.'
     )]
     private ?UploadedFile $file = null;
+
+    #[ORM\PreRemove]
+    public function deleteFile(): void
+    {
+        $path = $this->getPath();
+
+        if ($path !== '' && file_exists($path)) {
+            unlink($path);
+        }
+    }
 
     public function getId(): ?int
     {

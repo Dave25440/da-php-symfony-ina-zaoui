@@ -118,12 +118,6 @@ final class MediaController extends AbstractController
         $this->manager->remove($media);
         $this->manager->flush();
 
-        $path = $media->getPath();
-
-        if ($path !== '' && file_exists($path)) {
-            unlink($path);
-        }
-
         $page = $request->request->get('page', 1);
 
         return $this->redirectToRoute('admin_media_index', ['page' => $page]);
