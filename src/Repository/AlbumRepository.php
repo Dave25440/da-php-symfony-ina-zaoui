@@ -8,6 +8,8 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Album>
+ *
+ * @method Album[] findAll()
  */
 class AlbumRepository extends ServiceEntityRepository
 {
