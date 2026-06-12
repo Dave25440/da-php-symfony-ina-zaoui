@@ -23,32 +23,6 @@ final class MediaController extends AbstractController
     ) {}
 
     /**
-     * Initialise les critères de filtrage pour les requêtes.
-     *
-     * @return array<string, mixed>
-     */
-    private function getCriteria(): array
-    {
-        if (!$this->isGranted('ROLE_ADMIN')) {
-            return ['user' => $this->getUser()];
-        }
-
-        return [];
-    }
-
-    /**
-     * Récupère le nombre total de pages.
-     *
-     * @return int
-     */
-    private function getTotalPages(): int
-    {
-        $total = $this->mediaRepository->count($this->getCriteria());
-
-        return max(1, (int) ceil($total / $this->limit));
-    }
-
-    /**
      * Affiche la liste des médias.
      *
      * @param Request $request
@@ -143,5 +117,31 @@ final class MediaController extends AbstractController
         $page = $request->request->get('page', 1);
 
         return $this->redirectToRoute('admin_media_index', ['page' => $page]);
+    }
+
+    /**
+     * Initialise les critères de filtrage pour les requêtes.
+     *
+     * @return array<string, mixed>
+     */
+    private function getCriteria(): array
+    {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return ['user' => $this->getUser()];
+        }
+
+        return [];
+    }
+
+    /**
+     * Récupère le nombre total de pages.
+     *
+     * @return int
+     */
+    private function getTotalPages(): int
+    {
+        $total = $this->mediaRepository->count($this->getCriteria());
+
+        return max(1, (int) ceil($total / $this->limit));
     }
 }

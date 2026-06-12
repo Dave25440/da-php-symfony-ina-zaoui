@@ -37,29 +37,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     /**
      * @param string $role
      * @param bool $hasRole
-     *
-     * @return QueryBuilder
-     */
-    private function getRole(string $role, bool $hasRole): QueryBuilder
-    {
-        $qb = $this->createQueryBuilder('u');
-
-        $roleLike = '%"' . $role . '"%';
-
-        if ($hasRole) {
-            $qb->andWhere('u.roles LIKE :role');
-        } else {
-            $qb->andWhere('u.roles NOT LIKE :role');
-        }
-
-        $qb->setParameter('role', $roleLike);
-
-        return $qb;
-    }
-
-    /**
-     * @param string $role
-     * @param bool $hasRole
      * @param int|null $limit
      * @param int|null $offset
      *
@@ -92,6 +69,29 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->select('COUNT(u.id)');
 
         return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @param string $role
+     * @param bool $hasRole
+     *
+     * @return QueryBuilder
+     */
+    private function getRole(string $role, bool $hasRole): QueryBuilder
+    {
+        $qb = $this->createQueryBuilder('u');
+
+        $roleLike = '%"' . $role . '"%';
+
+        if ($hasRole) {
+            $qb->andWhere('u.roles LIKE :role');
+        } else {
+            $qb->andWhere('u.roles NOT LIKE :role');
+        }
+
+        $qb->setParameter('role', $roleLike);
+
+        return $qb;
     }
 
 //    /**

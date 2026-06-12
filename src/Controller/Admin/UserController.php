@@ -23,18 +23,6 @@ final class UserController extends AbstractController
     ) {}
 
     /**
-     * Récupère le nombre total de pages.
-     *
-     * @return int
-     */
-    private function getTotalPages(): int
-    {
-        $total = $this->userRepository->countByRole('ROLE_ADMIN', false);
-
-        return max(1, (int) ceil($total / $this->limit));
-    }
-
-    /**
      * Affiche la liste des invité·es.
      *
      * @param Request $request
@@ -162,5 +150,17 @@ final class UserController extends AbstractController
         $page = $request->request->get('page', 1);
 
         return $this->redirectToRoute('admin_user_index', ['page' => $page]);
+    }
+
+    /**
+     * Récupère le nombre total de pages.
+     *
+     * @return int
+     */
+    private function getTotalPages(): int
+    {
+        $total = $this->userRepository->countByRole('ROLE_ADMIN', false);
+
+        return max(1, (int) ceil($total / $this->limit));
     }
 }
