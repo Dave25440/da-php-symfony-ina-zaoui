@@ -111,7 +111,7 @@ class AppFixtures extends Fixture
         $media = new Media();
         $media->setUser($user)
             ->setAlbum($album)
-            ->setPath('uploads/' . str_pad((string) $mediaNumber, 4, '0', STR_PAD_LEFT) . '.jpg')
+            ->setPath('uploads/' . str_pad((string) $mediaNumber, 4, '0', STR_PAD_LEFT) . '.webp')
             ->setTitle('Titre ' . $titleIndex);
 
         $this->manager->persist($media);
