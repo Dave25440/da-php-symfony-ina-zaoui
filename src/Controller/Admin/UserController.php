@@ -95,9 +95,7 @@ final class UserController extends AbstractController
         $roles = $user->getRoles();
 
         if (in_array('ROLE_GUEST', $roles, true)) {
-            $roles = array_diff($roles, ['ROLE_GUEST']);
-            $roles = array_values($roles);
-            $user->setRoles($roles);
+            $user->setRoles([]);
 
             $this->manager->persist($user);
             $this->manager->flush();
@@ -121,9 +119,7 @@ final class UserController extends AbstractController
         $roles = $user->getRoles();
 
         if (!in_array('ROLE_GUEST', $roles, true)) {
-            $roles[] = 'ROLE_GUEST';
-            $roles = array_values($roles);
-            $user->setRoles($roles);
+            $user->setRoles(['ROLE_GUEST']);
 
             $this->manager->persist($user);
             $this->manager->flush();
