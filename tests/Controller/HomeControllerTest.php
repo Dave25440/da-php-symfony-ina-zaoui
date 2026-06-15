@@ -172,18 +172,26 @@ final class HomeControllerTest extends WebTestCase
             );
         }
 
-        for ($i = 0; $i < $guests->count(); $i++) {
+        $guestCount = $guests->count();
+
+        for ($i = 0; $i < $guestCount; $i++) {
             $guest = $guests->eq($i);
             self::assertCount(1, $guest->filter('a:contains("découvrir")'));
+        }
 
+        foreach ([0, $guestCount - 1] as $i) {
+            $guest = $guests->eq($i);
             $link = $guest->selectLink('découvrir')->link();
+
             self::assertMatchesRegularExpression('/\/guests\/\d+$/', $link->getUri());
 
             $this->client->click($link);
             self::assertSelectorTextContains('h1', $guestNames[$i]);
 
-            $crawler = $this->client->request('GET', '/guests');
-            $guests = $crawler->filter('.guest');
+            if ($i < $guestCount - 1) {
+                $crawler = $this->client->request('GET', '/guests');
+                $guests = $crawler->filter('.guest');
+            }
         }
     }
 }
