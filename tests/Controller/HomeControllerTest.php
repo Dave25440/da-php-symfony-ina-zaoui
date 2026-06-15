@@ -66,7 +66,6 @@ final class HomeControllerTest extends WebTestCase
         );
 
         $logoAlt = $homeLink->filter('img')->attr('alt');
-
         self::assertSame('Ina Zaoui', $logoAlt);
 
         $expectedNav = [
@@ -102,7 +101,7 @@ final class HomeControllerTest extends WebTestCase
      * @param string $path
      * @param string $title
      * @param string|null $expectedClass
-     * @param string|null $linkText
+     * @param string|null $linkLabel
      * @param string|null $newTitle
      */
     #[DataProvider('pageProvider')]
@@ -110,7 +109,7 @@ final class HomeControllerTest extends WebTestCase
         string $path,
         string $title,
         ?string $expectedClass = null,
-        ?string $linkText = null,
+        ?string $linkLabel = null,
         ?string $newTitle = null
     ): void
     {
@@ -123,8 +122,8 @@ final class HomeControllerTest extends WebTestCase
             self::assertSelectorExists('.' . $expectedClass);
         }
 
-        if ($linkText !== null && $newTitle !== null) {
-            $link = $crawler->selectLink($linkText)->link();
+        if ($linkLabel !== null && $newTitle !== null) {
+            $link = $crawler->selectLink($linkLabel)->link();
             $this->client->click($link);
 
             self::assertSelectorTextContains('h1', $newTitle);
