@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller;
 
+use App\Repository\UserRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -127,6 +128,62 @@ final class HomeControllerTest extends WebTestCase
             $this->client->click($link);
 
             self::assertSelectorTextContains('h1', $newTitle);
+        }
+    }
+
+    public function testGuestsPage(): void
+    {
+        $crawler = $this->client->request('GET', '/guests');
+        self::assertResponseIsSuccessful();
+
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $expectedGuests = $userRepository->findByRole('ROLE_GUEST', true);
+        $guests = $crawler->filter('.guest');
+
+        self::assertCount(count($expectedGuests), $guests);
+
+        $expectedNames = array_map(fn($guest) => $guest->getName(), $expectedGuests);
+        $guestTitles = $guests->filter('h2');
+
+        $guestNames = $guestTitles->each(function ($node) {
+            // Extraction du nom de l'invité·e sans le nombre de médias
+            return preg_replace('/\s*\(\d+\)$/', '', trim($node->text()));
+        });
+
+        self::assertSame($expectedNames, $guestNames);
+
+        $expectedMediaCounts = array_map(
+            fn($guest) => count($guest->getMedias()),
+            $expectedGuests
+        );
+
+        $guestMediaCounts = $guestTitles->each(function ($node) {
+            // Extraction du nombre de médias
+            return (bool) preg_match('/\((\d+)\)$/', $node->text(), $matches)
+                ? (int) $matches[1]
+                : 0;
+        });
+
+        foreach ($expectedMediaCounts as $i => $expectedCount) {
+            self::assertSame(
+                $expectedCount,
+                $guestMediaCounts[$i],
+                "Le nombre de médias de {$guestNames[$i]} est correct."
+            );
+        }
+
+        for ($i = 0; $i < $guests->count(); $i++) {
+            $guest = $guests->eq($i);
+            self::assertCount(1, $guest->filter('a:contains("découvrir")'));
+
+            $link = $guest->selectLink('découvrir')->link();
+            self::assertMatchesRegularExpression('/\/guests\/\d+$/', $link->getUri());
+
+            $this->client->click($link);
+            self::assertSelectorTextContains('h1', $guestNames[$i]);
+
+            $crawler = $this->client->request('GET', '/guests');
+            $guests = $crawler->filter('.guest');
         }
     }
 }
