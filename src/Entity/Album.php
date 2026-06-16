@@ -29,7 +29,7 @@ class Album
     /**
      * @var Collection<int, Media>
      */
-    #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'album')]
+    #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'album', orphanRemoval: true)]
     private Collection $medias;
 
     public function __construct()
