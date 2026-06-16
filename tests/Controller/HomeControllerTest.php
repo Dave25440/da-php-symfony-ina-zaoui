@@ -167,9 +167,17 @@ final class HomeControllerTest extends WebTestCase
         self::assertResponseIsSuccessful();
 
         $expectedGuests = $this->userRepository->findByRole('ROLE_GUEST', true);
+        $expectedGuestCount = count($expectedGuests);
         $guests = $crawler->filter('.guest');
 
-        self::assertCount(count($expectedGuests), $guests);
+        if ($expectedGuestCount === 0) {
+            self::assertCount(0, $guests);
+            self::assertSelectorTextContains('p', 'Aucun invité disponible.');
+
+            return;
+        }
+
+        self::assertCount($expectedGuestCount, $guests);
 
         $expectedNames = array_map(fn($guest) => $guest->getName(), $expectedGuests);
         $guestTitles = $guests->filter('h2');
