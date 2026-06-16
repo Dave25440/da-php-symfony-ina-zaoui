@@ -10,10 +10,12 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 final class HomeControllerTest extends WebTestCase
 {
     private KernelBrowser $client;
+    private UserRepository $userRepository;
 
     protected function setUp(): void
     {
         $this->client = static::createClient();
+        $this->userRepository = static::getContainer()->get(UserRepository::class);
     }
 
     /**
@@ -45,6 +47,15 @@ final class HomeControllerTest extends WebTestCase
         yield 'Last album in the portfolio' => ['/portfolio/5', 'Portfolio'];
         yield 'About' => ['/about', 'Qui suis-je ?', 'about-description'];
         yield 'Login' => ['/login', 'Connexion'];
+    }
+
+    /**
+     * @return iterable<array<int>>
+     */
+    public static function guestProvider(): iterable
+    {
+        yield 'First visible guest' => [2];
+        yield 'Last visible guest' => [100];
     }
 
     /**
@@ -136,8 +147,7 @@ final class HomeControllerTest extends WebTestCase
         $crawler = $this->client->request('GET', '/guests');
         self::assertResponseIsSuccessful();
 
-        $userRepository = static::getContainer()->get(UserRepository::class);
-        $expectedGuests = $userRepository->findByRole('ROLE_GUEST', true);
+        $expectedGuests = $this->userRepository->findByRole('ROLE_GUEST', true);
         $guests = $crawler->filter('.guest');
 
         self::assertCount(count($expectedGuests), $guests);
@@ -192,6 +202,43 @@ final class HomeControllerTest extends WebTestCase
                 $crawler = $this->client->request('GET', '/guests');
                 $guests = $crawler->filter('.guest');
             }
+        }
+    }
+
+    /**
+     * @param int $id
+     */
+    #[DataProvider('guestProvider')]
+    public function testGuestPage(int $id): void
+    {
+        $expectedGuest = $this->userRepository->find($id);
+        self::assertNotNull($expectedGuest);
+
+        $crawler = $this->client->request('GET', '/guests/' . $id);
+        self::assertResponseIsSuccessful();
+
+        $guestName = $crawler->filter('h1')->text();
+        $expectedDesc = $expectedGuest->getDescription() ?? '';
+        $guestDesc = $crawler->filter('p')->text();
+
+        self::assertSame($expectedGuest->getName(), $guestName);
+        self::assertSame($expectedDesc, $guestDesc);
+
+        $expectedMedias = $expectedGuest->getMedias();
+        $guestMedias = $crawler->filter('img.w-100');
+
+        self::assertCount(count($expectedMedias), $guestMedias);
+
+        $guestMediaPaths = $guestMedias->each(fn($node) =>
+            ltrim((string) $node->attr('src'), '/')
+        );
+
+        foreach ($expectedMedias as $i => $media) {
+            self::assertSame(
+                $media->getPath(),
+                $guestMediaPaths[$i],
+                "Le média #$i de $guestName est correct."
+            );
         }
     }
 }
