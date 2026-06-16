@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller;
 
+use App\Repository\AlbumRepository;
 use App\Repository\UserRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -11,11 +12,13 @@ use Symfony\Component\HttpFoundation\Response;
 final class HomeControllerTest extends WebTestCase
 {
     private KernelBrowser $client;
+    private AlbumRepository $albumRepository;
     private UserRepository $userRepository;
 
     protected function setUp(): void
     {
         $this->client = static::createClient();
+        $this->albumRepository = static::getContainer()->get(AlbumRepository::class);
         $this->userRepository = static::getContainer()->get(UserRepository::class);
     }
 
@@ -255,6 +258,58 @@ final class HomeControllerTest extends WebTestCase
                 $media->getPath(),
                 $guestMediaPaths[$i],
                 "Le média #$i de $guestName est correct."
+            );
+        }
+    }
+
+    public function testPortfolioPage(): void
+    {
+        $crawler = $this->client->request('GET', '/portfolio');
+        self::assertResponseIsSuccessful();
+
+        $albums = $this->albumRepository->findAll();
+        $albumsCount = max(1, count($albums) + 1);
+        $buttons = $crawler->filter('a.btn');
+
+        self::assertCount($albumsCount, $buttons);
+
+        $buttonClass = $buttons->eq(0)->attr('class');
+        self::assertStringContainsString('active', (string) $buttonClass);
+
+        $admin = $this->userRepository->findByRole('ROLE_ADMIN', true, 1);
+        $admin = $admin[0] ?? null;
+        $medias = $crawler->filter('img.w-100');
+
+        if ($admin === null) {
+            self::assertCount(0, $medias);
+            self::assertSelectorTextContains('p', 'Aucun média disponible.');
+
+            return;
+        }
+
+        $expectedMedias = $admin->getMedias()->toArray();
+        self::assertCount(count($expectedMedias), $medias);
+
+        $mediaPaths = $medias->each(fn($node) =>
+            ltrim((string) $node->attr('src'), '/')
+        );
+
+        foreach ($expectedMedias as $i => $media) {
+            self::assertSame(
+                $media->getPath(),
+                $mediaPaths[$i],
+                "Le média #$i de {$admin->getName()} est correct."
+            );
+        }
+
+        $expectedTitles = array_map(fn($media) => $media->getTitle(), $expectedMedias);
+        $titles = $crawler->filter('p.media-title')->each(fn($node) => $node->text());
+
+        foreach ($expectedTitles as $i => $title) {
+            self::assertSame(
+                $title,
+                $titles[$i],
+                "Le titre du média #$i de {$admin->getName()} est correct."
             );
         }
     }
