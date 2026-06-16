@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 final class HomeControllerTest extends WebTestCase
 {
@@ -54,8 +55,12 @@ final class HomeControllerTest extends WebTestCase
      */
     public static function guestProvider(): iterable
     {
+        yield 'Admin' => [1];
         yield 'First visible guest' => [2];
+        yield 'First blocked guest' => [3];
         yield 'Last visible guest' => [100];
+        yield 'Last blocked guest' => [101];
+        yield 'Guest not found' => [102];
     }
 
     /**
@@ -212,9 +217,21 @@ final class HomeControllerTest extends WebTestCase
     public function testGuestPage(int $id): void
     {
         $expectedGuest = $this->userRepository->find($id);
-        self::assertNotNull($expectedGuest);
-
         $crawler = $this->client->request('GET', '/guests/' . $id);
+
+        if ($expectedGuest === null) {
+            self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+
+            return;
+        }
+
+        if (!in_array('ROLE_GUEST', $expectedGuest->getRoles(), true)) {
+            self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+            self::assertSelectorTextContains('body', 'Invité·e introuvable.');
+
+            return;
+        }
+
         self::assertResponseIsSuccessful();
 
         $guestName = $crawler->filter('h1')->text();
