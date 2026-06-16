@@ -67,6 +67,17 @@ final class HomeControllerTest extends WebTestCase
     }
 
     /**
+     * @return iterable<array<int|null>>
+     */
+    public static function albumProvider(): iterable
+    {
+        yield 'No album' => [null];
+        yield 'First album' => [1];
+        yield 'Last album' => [5];
+        yield 'Album not found' => [6];
+    }
+
+    /**
      * @param string $path
      */
     #[DataProvider('pathProvider')]
@@ -262,9 +273,15 @@ final class HomeControllerTest extends WebTestCase
         }
     }
 
-    public function testPortfolioPage(): void
+    /**
+     * @param int|null $id
+     */
+    #[DataProvider('albumProvider')]
+    public function testPortfolioPage(?int $id): void
     {
-        $crawler = $this->client->request('GET', '/portfolio');
+        $url = '/portfolio' . ($id !== null ? '/' . $id : '');
+        $crawler = $this->client->request('GET', $url);
+
         self::assertResponseIsSuccessful();
 
         $albums = $this->albumRepository->findAll();
@@ -273,7 +290,12 @@ final class HomeControllerTest extends WebTestCase
 
         self::assertCount($albumsCount, $buttons);
 
-        $buttonClass = $buttons->eq(0)->attr('class');
+        $albumIds = array_map(fn($album) => $album->getId(), $albums);
+        $validId = $id !== null && in_array($id, $albumIds, true);
+
+        $activeIndex = $validId ? ((int) array_search($id, $albumIds, true) + 1) : 0;
+        $buttonClass = $buttons->eq($activeIndex)->attr('class');
+
         self::assertStringContainsString('active', (string) $buttonClass);
 
         $admin = $this->userRepository->findByRole('ROLE_ADMIN', true, 1);
@@ -287,8 +309,23 @@ final class HomeControllerTest extends WebTestCase
             return;
         }
 
-        $expectedMedias = $admin->getMedias()->toArray();
-        self::assertCount(count($expectedMedias), $medias);
+        if ($validId) {
+            $album = $this->albumRepository->find($id);
+            $expectedMedias = $album !== null ? $album->getMedias()->toArray() : [];
+        } else {
+            $expectedMedias = $admin->getMedias()->toArray();
+        }
+
+        $expectedMediaCount = count($expectedMedias);
+
+        if ($expectedMediaCount === 0) {
+            self::assertCount(0, $medias);
+            self::assertSelectorTextContains('p', 'Aucun média disponible.');
+
+            return;
+        }
+
+        self::assertCount($expectedMediaCount, $medias);
 
         $mediaPaths = $medias->each(fn($node) =>
             ltrim((string) $node->attr('src'), '/')
