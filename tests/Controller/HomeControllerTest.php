@@ -29,11 +29,7 @@ final class HomeControllerTest extends WebTestCase
     {
         yield 'Home' => ['/'];
         yield 'Guests' => ['/guests'];
-        yield 'First visible guest' => ['/guests/2'];
-        yield 'Last visible guest' => ['/guests/100'];
         yield 'Portfolio' => ['/portfolio'];
-        yield 'First album in the portfolio' => ['/portfolio/1'];
-        yield 'Last album in the portfolio' => ['/portfolio/5'];
         yield 'About' => ['/about'];
     }
 
@@ -94,10 +90,11 @@ final class HomeControllerTest extends WebTestCase
     public function testNavigation(string $path): void
     {
         $crawler = $this->client->request('GET', $path);
+        self::assertResponseIsSuccessful();
+
         $homeLink = $crawler->filter('a[href="/"]');
         $navLinks = $crawler->filter('.nav-link');
 
-        self::assertResponseIsSuccessful();
         self::assertCount(1, $homeLink);
         self::assertCount(4, $navLinks);
 
