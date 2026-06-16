@@ -264,9 +264,17 @@ final class HomeControllerTest extends WebTestCase
         self::assertSame($expectedDesc, $guestDesc);
 
         $expectedMedias = $expectedGuest->getMedias();
+        $expectedMediaCount = count($expectedMedias);
         $guestMedias = $crawler->filter('img.w-100');
 
-        self::assertCount(count($expectedMedias), $guestMedias);
+        if ($expectedMediaCount === 0) {
+            self::assertCount(0, $guestMedias);
+            self::assertSelectorTextContains('p', 'Aucun média disponible.');
+
+            return;
+        }
+
+        self::assertCount($expectedMediaCount, $guestMedias);
 
         $guestMediaPaths = $guestMedias->each(fn($node) =>
             ltrim((string) $node->attr('src'), '/')
