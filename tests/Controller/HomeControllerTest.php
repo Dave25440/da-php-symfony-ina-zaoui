@@ -38,6 +38,16 @@ final class HomeControllerTest extends WebTestCase
     }
 
     /**
+     * @return iterable<array<string>>
+     */
+    public static function roleProvider(): iterable
+    {
+        yield 'Admin' => ['ROLE_ADMIN'];
+        yield 'Guest' => ['ROLE_GUEST'];
+        yield 'No role' => [''];
+    }
+
+    /**
      * @return iterable<array<string|null>>
      */
     public static function pageProvider(): iterable
@@ -104,6 +114,63 @@ final class HomeControllerTest extends WebTestCase
             'Portfolio' => '/portfolio',
             'Qui suis-je ?' => '/about',
             'Connexion' => '/login',
+        ];
+
+        $navLabels = $navLinks->each(fn($node) => trim($node->text()));
+        $navUrls = $navLinks->each(fn($node) => $node->attr('href'));
+
+        $i = 0;
+
+        foreach ($expectedNav as $label => $url) {
+            self::assertSame(
+                $label,
+                $navLabels[$i],
+                "Le lien '$label' est bien placé dans le menu de navigation."
+            );
+
+            self::assertSame(
+                $url,
+                $navUrls[$i],
+                "Le lien '$label' renvoie vers '$url'."
+            );
+
+            $i++;
+        }
+    }
+
+    /**
+     * @param string $role
+     */
+    #[DataProvider('roleProvider')]
+    public function testNavigationForAuthenticatedUser(string $role): void
+    {
+        if ($role === '') {
+            $users = $this->userRepository->findByRole('ROLE_GUEST', false, 2);
+            $user = $users[1] ?? null;
+        } else {
+            $user = $this->userRepository->findByRole($role, true, 1);
+            $user = $user[0] ?? null;
+        }
+
+        self::assertNotNull($user);
+        $this->client->loginUser($user);
+
+        $crawler = $this->client->request('GET', '/');
+        self::assertResponseIsSuccessful();
+
+        $homeLink = $crawler->filter('a[href="/"]');
+        $navLinks = $crawler->filter('.nav-link');
+
+        self::assertCount(1, $homeLink);
+        self::assertCount(5, $navLinks);
+        self::assertSelectorNotExists('a[href="/login"]');
+
+        $expectedNav = [
+            'Invités' => '/guests',
+            'Portfolio' => '/portfolio',
+            'Qui suis-je ?' => '/about',
+            'Admin' => '/admin/media',
+            'Déconnexion' => '/logout',
         ];
 
         $navLabels = $navLinks->each(fn($node) => trim($node->text()));
