@@ -112,7 +112,12 @@ final class HomeControllerTest extends WebTestCase
 
         self::assertCount($expectedGuestCount, $guests);
 
-        $expectedGuests = $this->userRepository->findByRole('ROLE_GUEST', true);
+        $expectedGuests = $this->userRepository->findByRole(
+            'ROLE_GUEST',
+            true,
+            withMedias: true
+        );
+
         $expectedNames = array_map(fn($guest) => $guest->getName(), $expectedGuests);
         $guestTitles = $guests->filter('h2');
 
