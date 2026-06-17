@@ -147,4 +147,25 @@ final class NavigationTest extends WebTestCase
             $i++;
         }
     }
+
+    public function testLogoutLink(): void
+    {
+        $user = $this->userRepository->findByRole('ROLE_ADMIN', true, 1);
+        $user = $user[0] ?? null;
+
+        self::assertNotNull($user);
+        $this->client->loginUser($user);
+
+        $crawler = $this->client->request('GET', '/');
+        self::assertResponseIsSuccessful();
+
+        $logoutLink = $crawler->selectLink('Déconnexion');
+        self::assertCount(1, $logoutLink);
+
+        $this->client->click($logoutLink->link());
+        $this->client->followRedirect();
+
+        self::assertSelectorExists('a[href="/login"]');
+        self::assertSelectorTextContains('h1', 'Photographe');
+    }
 }
