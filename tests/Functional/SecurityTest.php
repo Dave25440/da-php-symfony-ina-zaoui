@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional;
 
+use App\Repository\UserRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -10,10 +11,12 @@ use Symfony\Component\HttpFoundation\Response;
 final class SecurityTest extends WebTestCase
 {
     private KernelBrowser $client;
+    private UserRepository $userRepository;
 
     protected function setUp(): void
     {
         $this->client = static::createClient();
+        $this->userRepository = static::getContainer()->get(UserRepository::class);
     }
 
     /**
@@ -67,5 +70,41 @@ final class SecurityTest extends WebTestCase
                 self::assertSelectorTextContains('h1', 'Admin');
                 break;
         }
+    }
+
+    public function testLoginPageForAuthenticatedUser(): void
+    {
+        $user = $this->userRepository->findByRole('ROLE_ADMIN', true, 1);
+        $user = $user[0] ?? null;
+
+        self::assertNotNull($user);
+        $this->client->loginUser($user);
+
+        $crawler = $this->client->request('GET', '/login');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorNotExists('form');
+
+        self::assertSelectorTextContains(
+            'p',
+            "Vous êtes connecté(e) en tant que {$user->getName()}."
+        );
+
+        $homeLink = $crawler->selectLink('Retour');
+        self::assertCount(1, $homeLink);
+
+        $this->client->click($homeLink->link());
+        self::assertSelectorTextContains('h1', 'Photographe');
+
+        $crawler = $this->client->request('GET', '/login');
+        $logoutLink = $crawler->selectLink('Se déconnecter');
+
+        self::assertCount(1, $logoutLink);
+
+        $this->client->click($logoutLink->link());
+        $this->client->followRedirect();
+
+        self::assertSelectorExists('a[href="/login"]');
+        self::assertSelectorTextContains('h1', 'Photographe');
     }
 }
