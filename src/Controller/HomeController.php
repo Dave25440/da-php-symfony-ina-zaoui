@@ -38,7 +38,11 @@ final class HomeController extends AbstractController
     #[Route('/guests', name: 'guests', methods: ['GET'])]
     public function guests(): Response
     {
-        $guests = $this->userRepository->findByRole('ROLE_GUEST', true);
+        $guests = $this->userRepository->findByRole(
+            'ROLE_GUEST',
+            true,
+            withMedias: true
+        );
 
         return $this->render('front/guests.html.twig', [
             'guests' => $guests

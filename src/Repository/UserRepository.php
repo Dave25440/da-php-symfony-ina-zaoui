@@ -41,10 +41,17 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      * @param bool $hasRole
      * @param int|null $limit
      * @param int|null $offset
+     * @param bool $withMedias
      *
      * @return User[]
      */
-    public function findByRole(string $role, bool $hasRole, ?int $limit = null, ?int $offset = null): array
+    public function findByRole(
+        string $role,
+        bool $hasRole,
+        ?int $limit = null,
+        ?int $offset = null,
+        bool $withMedias = false
+    ): array
     {
         $qb = $this->getRole($role, $hasRole);
 
@@ -54,6 +61,11 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         if ($offset !== null) {
             $qb->setFirstResult($offset);
+        }
+
+        if ($withMedias) {
+            $qb->leftJoin('u.medias', 'm')
+                ->addSelect('m');
         }
 
         return $qb->getQuery()->getResult();
