@@ -100,8 +100,7 @@ final class HomeControllerTest extends WebTestCase
         $crawler = $this->client->request('GET', '/guests');
         self::assertResponseIsSuccessful();
 
-        $expectedGuests = $this->userRepository->findByRole('ROLE_GUEST', true);
-        $expectedGuestCount = count($expectedGuests);
+        $expectedGuestCount = $this->userRepository->countByRole('ROLE_GUEST', true);
         $guests = $crawler->filter('.guest');
 
         if ($expectedGuestCount === 0) {
@@ -113,6 +112,7 @@ final class HomeControllerTest extends WebTestCase
 
         self::assertCount($expectedGuestCount, $guests);
 
+        $expectedGuests = $this->userRepository->findByRole('ROLE_GUEST', true);
         $expectedNames = array_map(fn($guest) => $guest->getName(), $expectedGuests);
         $guestTitles = $guests->filter('h2');
 

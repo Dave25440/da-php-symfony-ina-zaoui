@@ -98,8 +98,8 @@ final class NavigationTest extends WebTestCase
     public function testNavigationForAuthenticatedUser(string $role): void
     {
         if ($role === '') {
-            $users = $this->userRepository->findByRole('ROLE_GUEST', false, 2);
-            $user = $users[1] ?? null;
+            $user = $this->userRepository->findByRole('ROLE_GUEST', false, 1, 1);
+            $user = $user[0] ?? null;
         } else {
             $user = $this->userRepository->findByRole($role, true, 1);
             $user = $user[0] ?? null;
