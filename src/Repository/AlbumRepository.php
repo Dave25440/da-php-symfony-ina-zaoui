@@ -9,6 +9,7 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * @extends ServiceEntityRepository<Album>
  *
+ * @method Album|null find(mixed $id, int|null $lockMode = null, int|null $lockVersion = null)
  * @method Album[] findAll()
  */
 class AlbumRepository extends ServiceEntityRepository
