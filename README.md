@@ -7,7 +7,7 @@ Ce projet est une refonte optimisée et mise à jour du site vers Symfony 7.4.
 
 ## Prérequis
 
-- PHP 8.2 ou ultérieur
+- PHP 8.4 ou ultérieur
 - Composer (gestionnaire de dépendances PHP) installé
 - Symfony CLI installé
 - Serveur web (exemple : Apache avec MAMP)
